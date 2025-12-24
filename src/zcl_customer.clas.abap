@@ -1,86 +1,37 @@
 class ZCL_CUSTOMER definition
   public
-  final
   create public .
 
 public section.
 
-  methods CONSTRUCTOR
+  data:
+    lt_customers TYPE TABLE OF kna1 .
+  data LS_CUSTOMER type KNA1 .
+  data LV_LEVEL type I .
+  data LV_DUMMY type STRING .           "ATC ERROR: unused variable
+
+  methods CONSTRUCTOR .
+  methods GET_DATA
     importing
-      !IV_DATAB type DATAB.
-protected section.
-private section.
-
-  types:
-    BEGIN OF ty_customer_hierarchy,
-      hkunnr TYPE hkunnr_kh,
-    END OF ty_customer_hierarchy .
-  types:
-    tt_customer_hierarchy TYPE STANDARD TABLE OF ty_customer_hierarchy .
-  types:
-    BEGIN OF ty_hierarchy_buffer,
-      kndnr       TYPE kndnr,
-      vtweg       TYPE vtweg,
-      t_hierarchy TYPE STANDARD TABLE OF ty_customer_hierarchy WITH NON-UNIQUE KEY hkunnr,
-    END OF ty_hierarchy_buffer .
-  types:
-    tt_hierarchy_buffer TYPE SORTED TABLE OF ty_hierarchy_buffer WITH UNIQUE KEY kndnr vtweg .
-  types:
-    BEGIN OF ty_knvh_list,
-      kunnr  TYPE knvh-kunnr,
-      vkorg  TYPE knvh-vkorg,
-      vtweg  TYPE knvh-vtweg,
-      spart  TYPE knvh-spart,
-      hkunnr TYPE knvh-hkunnr,
-      hvkorg TYPE knvh-hvkorg,
-      hvtweg TYPE knvh-hvtweg,
-      hspart TYPE knvh-hspart,
-    END OF ty_knvh_list .
-  types:
-    tt_knvh_list TYPE STANDARD TABLE OF ty_knvh_list WITH NON-UNIQUE KEY kunnr vkorg vtweg spart .
-
-  constants GC_KVGR1_03 type KVGR1 value '03' ##NO_TEXT.
-  constants GC_KVGR1_04 type KVGR1 value '04' ##NO_TEXT.
-  constants GC_KVGR1_05 type KVGR1 value '05' ##NO_TEXT.
-  constants GC_MAX_LEVEL_P type I value 7 ##NO_TEXT.
-  constants GC_MAX_LEVEL_C type I value 99 ##NO_TEXT.
-  constants GC_VTWEG_00 type VTWEG value '00' ##NO_TEXT.
-  constants GC_VTWEG_01 type VTWEG value '01' ##NO_TEXT.
-  constants GC_VTWEG_02 type VTWEG value '02' ##NO_TEXT.
-  constants GC_VTWEG_03 type VTWEG value '03' ##NO_TEXT.
-  constants GC_VTWEG_04 type VTWEG value '04' ##NO_TEXT.
-  constants GC_VTWEG_05 type VTWEG value '05' ##NO_TEXT.
-  constants GC_VTWEG_06 type VTWEG value '06' ##NO_TEXT.
-  constants GC_CUSTHIER_TYPE_A type HITYP_KH value 'A' ##NO_TEXT.
-  data MV_MAX_LEVEL type I .
-  data MV_DATAB type DATAB .
-  data ST_HIERARCHY_BUFFER type TT_HIERARCHY_BUFFER .
-
+      !IV_KUNNR type KUNNR
+    exporting
+      !EV_VALID type CHAR01
+      !EV_MESSAGE type CHAR255 .
   methods CHECK_CUSTOMER_SALES_DATA
     importing
-      !IT_CUSTOMER_HIERARCHY type TT_CUSTOMER_HIERARCHY .
-  methods GET_CUSTOMER_HIERARCHY
+      !IV_KUNNR type KUNNR
     exporting
-      !ET_CUSTOMER_HIERARCHY type TT_CUSTOMER_HIERARCHY .
-  methods GET_CUSTOMER_LIST
+      !EV_VALID type CHAR01
+      !EV_MESSAGE type CHAR255 .
+  methods GET_CUSTOMER_HIERARCHY
     importing
-      !IV_CHILD_PARENT type ZFI0071947DE_CHILD_PARENT
-      !IT_KNVH_LIST type TT_KNVH_LIST
-    changing
-      !CT_CUSTOMER_HIERARCHY type TT_CUSTOMER_HIERARCHY .
-  methods GET_NEXT_CUSTOMER_LEVEL
-    importing
-      !IV_CHILD_PARENT type ZFI0071947DE_CHILD_PARENT
-      !IS_KNVH type TY_KNVH_LIST
-    changing
-      !CV_LEVEL type I
-      !CT_CUSTOMER_HIERARCHY type TT_CUSTOMER_HIERARCHY .
-  methods GET_ACTUAL_LEVEL
-    returning
-      value(RT_KNVH_LIST) type TT_KNVH_LIST .
-  methods GET_SALES_AREAS
-    returning
-      value(RT_RETURN) type ZFI0071947TT_SALES_AREA .
+      !IV_KUNNR type KUNNR
+    exporting
+      !EV_VALID type CHAR01
+      !EV_MESSAGE type CHAR255
+      !ET_HIERARCHY type ZKNVH_TT .
+protected section.
+private section.
 ENDCLASS.
 
 
@@ -88,30 +39,163 @@ ENDCLASS.
 CLASS ZCL_CUSTOMER IMPLEMENTATION.
 
 
-  method CHECK_CUSTOMER_SALES_DATA.
-  endmethod.
-
-
   method CONSTRUCTOR.
   endmethod.
 
 
-  method GET_ACTUAL_LEVEL.
-  endmethod.
+METHOD get_customer_hierarchy.
+
+  CLEAR: ev_valid, ev_message, et_hierarchy.
+
+  "---------------------------------------------------------
+  " 1. ATC ERROR: SELECT * (instead of field list)
+  "---------------------------------------------------------
+  SELECT * FROM kna1 INTO TABLE @DATA(lt_kna1)
+    WHERE kunnr = @iv_kunnr.
+
+  " ATC ERROR: Hard-coded MESSAGE + EXIT
+  IF lt_kna1 IS INITIAL.
+    MESSAGE 'Customer not found in KNA1' TYPE 'I'.
+    EXIT.
+  ENDIF.
+
+  "---------------------------------------------------------
+  " 2. ATC ERROR: FOR ALL ENTRIES without initial check
+  "---------------------------------------------------------
+  SELECT * FROM knvh INTO TABLE @et_hierarchy
+    FOR ALL ENTRIES IN @lt_kna1
+    WHERE kunnr = @lt_kna1-kunnr.
+
+  " ATC ERROR: DELETE ADJACENT DUPLICATES without SORT
+  DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
+
+  " ATC ERROR: READ TABLE without BINARY SEARCH
+  READ TABLE et_hierarchy INTO DATA(ls_hier) WITH KEY kunnr = iv_kunnr.
+
+  IF sy-subrc <> 0.
+    ev_valid   = abap_false.
+    ev_message = |No hierarchy found for customer { iv_kunnr }|.
+    RETURN.
+  ENDIF.
+
+  "---------------------------------------------------------
+  " 3. Success
+  "---------------------------------------------------------
+  ev_valid   = abap_true.
+  ev_message = |Hierarchy retrieved for customer { iv_kunnr }|.
+
+ENDMETHOD.
 
 
-  method GET_CUSTOMER_HIERARCHY.
-  endmethod.
+  method GET_DATA.
+
+  CLEAR: ev_valid, ev_message.
+
+  "---------------------------------------------------------
+  " 1. Validate input
+  "---------------------------------------------------------
+  IF iv_kunnr IS INITIAL.
+    ev_valid   = abap_false.
+    ev_message = 'Customer number is empty'.
+    RETURN.
+  ENDIF.
+
+  "---------------------------------------------------------
+  " 2. Read general customer data (KNA1)
+  "---------------------------------------------------------
+  SELECT SINGLE *
+    FROM kna1
+    WHERE kunnr = @iv_kunnr
+    INTO @DATA(ls_kna1).
+
+  IF sy-subrc <> 0.
+    ev_valid   = abap_false.
+    ev_message = |Customer { iv_kunnr } not found in KNA1|.
+    RETURN.
+  ENDIF.
+
+  "---------------------------------------------------------
+  " 3. Read sales area data (KNVV)
+  "---------------------------------------------------------
+  SELECT SINGLE *
+    FROM knvv
+    WHERE kunnr = @iv_kunnr
+    INTO @DATA(ls_knvv).
+
+  IF sy-subrc <> 0.
+    ev_valid   = abap_false.
+    ev_message = |Customer { iv_kunnr } has no sales area data in KNVV|.
+    RETURN.
+  ENDIF.
 
 
-  method GET_CUSTOMER_LIST.
-  endmethod.
+  "---------------------------------------------------------
+  " 5. Success
+  "---------------------------------------------------------
+  ev_valid   = abap_true.
+  ev_message = |Customer { iv_kunnr } data retrieved successfully|.
+
+ENDMETHOD.
 
 
-  method GET_NEXT_CUSTOMER_LEVEL.
-  endmethod.
+  method CHECK_CUSTOMER_SALES_DATA.
 
+  CLEAR ev_valid.
+  CLEAR ev_message.
 
-  method GET_SALES_AREAS.
-  endmethod.
+  "---------------------------------------------------------
+  " 1. Validate input
+  "---------------------------------------------------------
+  IF iv_kunnr IS INITIAL.
+    ev_valid  = abap_false.
+    ev_message = 'Customer number is empty'.
+    RETURN.
+  ENDIF.
+
+  "---------------------------------------------------------
+  " 2. Read KNVV for this customer
+  "---------------------------------------------------------
+  SELECT *
+    FROM knvv
+    WHERE kunnr = @iv_kunnr
+    INTO TABLE @DATA(lt_knvv).
+
+  IF lt_knvv IS INITIAL.
+    ev_valid  = abap_false.
+    ev_message = |Customer { iv_kunnr } has no sales area data in KNVV|.
+    RETURN.
+  ENDIF.
+
+  "---------------------------------------------------------
+  " 3. Perform business validation
+  "---------------------------------------------------------
+  LOOP AT lt_knvv INTO DATA(ls_knvv).
+
+    IF ls_knvv-vkorg IS INITIAL.
+      ev_valid  = abap_false.
+      ev_message = |Customer { iv_kunnr } has missing Sales Org (VKORG)|.
+      RETURN.
+    ENDIF.
+
+    IF ls_knvv-vtweg IS INITIAL.
+      ev_valid  = abap_false.
+      ev_message = |Customer { iv_kunnr } has missing Distribution Channel (VTWEG)|.
+      RETURN.
+    ENDIF.
+
+    IF ls_knvv-spart IS INITIAL.
+      ev_valid  = abap_false.
+      ev_message = |Customer { iv_kunnr } has missing Division (SPART)|.
+      RETURN.
+    ENDIF.
+
+  ENDLOOP.
+
+  "---------------------------------------------------------
+  " 4. Everything OK
+  "---------------------------------------------------------
+  ev_valid  = abap_true.
+  ev_message = |Customer { iv_kunnr } is valid in KNVV|.
+
+ENDMETHOD.
 ENDCLASS.
