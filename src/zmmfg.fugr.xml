@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_FUGR" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <AREAT>MM Function Group</AREAT>
+   <INCLUDES>
+    <SOBJ_NAME>LZMMFGTOP</SOBJ_NAME>
+    <SOBJ_NAME>SAPLZMMFG</SOBJ_NAME>
+   </INCLUDES>
+   <FUNCTIONS>
+    <item>
+     <FUNCNAME>ZFM_MM_UPDATE_PO_ANALYSIS</FUNCNAME>
+     <SHORT_TEXT>Update PO Analysis Table</SHORT_TEXT>
+     <IMPORT>
+      <RSIMP>
+       <PARAMETER>IV_EBELN</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>EBELN</TYP>
+      </RSIMP>
+     </IMPORT>
+     <EXPORT>
+      <RSEXP>
+       <PARAMETER>EV_STATUS</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>CHAR20</TYP>
+      </RSEXP>
+     </EXPORT>
+     <EXCEPTION>
+      <RSEXC>
+       <EXCEPTION>NOT_FOUND</EXCEPTION>
+      </RSEXC>
+      <RSEXC>
+       <EXCEPTION>UPDATE_FAILED</EXCEPTION>
+      </RSEXC>
+     </EXCEPTION>
+     <DOCUMENTATION>
+      <RSFDO>
+       <PARAMETER>IV_EBELN</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Purchasing Document Number</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>EV_STATUS</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Char 20</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>NOT_FOUND</PARAMETER>
+       <KIND>X</KIND>
+       <STEXT>PO not found</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>UPDATE_FAILED</PARAMETER>
+       <KIND>X</KIND>
+       <STEXT>Update Failed</STEXT>
+      </RSFDO>
+     </DOCUMENTATION>
+    </item>
+    <item>
+     <FUNCNAME>Z_ZWF1_BACK_ORDER_CANCEL</FUNCNAME>
+     <SHORT_TEXT>Create Shipment Document from STO Purchase Order</SHORT_TEXT>
+     <IMPORT>
+      <RSIMP>
+       <PARAMETER>DELIVERY</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>LIKP-VBELN</TYP>
+      </RSIMP>
+     </IMPORT>
+     <EXPORT>
+      <RSEXP>
+       <PARAMETER>SALESORG</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>LIKP-VKORG</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>RESULT</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>SY-BATCH</TYP>
+      </RSEXP>
+      <RSEXP>
+       <PARAMETER>MESSAGE</PARAMETER>
+       <REFERENCE>X</REFERENCE>
+       <TYP>BAPIRET2-MESSAGE</TYP>
+      </RSEXP>
+     </EXPORT>
+     <TABLES>
+      <RSTBL>
+       <PARAMETER>RETURN</PARAMETER>
+       <DBSTRUCT>BAPIRET2</DBSTRUCT>
+       <OPTIONAL>X</OPTIONAL>
+      </RSTBL>
+     </TABLES>
+     <EXCEPTION>
+      <RSEXC>
+       <EXCEPTION>NO_VALUES</EXCEPTION>
+      </RSEXC>
+     </EXCEPTION>
+     <DOCUMENTATION>
+      <RSFDO>
+       <PARAMETER>DELIVERY</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Delivery</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>SALESORG</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Sales Organization</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>RESULT</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>ABAP System Field: Background Processing Active</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>MESSAGE</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Message Text</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>RETURN</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Characteristic Values</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>NO_VALUES</PARAMETER>
+       <KIND>X</KIND>
+       <STEXT>No values found</STEXT>
+      </RSFDO>
+     </DOCUMENTATION>
+    </item>
+   </FUNCTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
