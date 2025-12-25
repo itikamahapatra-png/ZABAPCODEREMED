@@ -1,6 +1,6 @@
 REPORT z_atc_demo_vbak_vbap_mara.
 
-TABLES: vbak, vbap, mara, mbew, mvke, makt,mseg.
+TABLES: vbak, vbap, mara, mbew, mvke, makt,bseg.
 
 TYPES: BEGIN OF ty_sales,
          vbeln  TYPE vbak-vbeln,
