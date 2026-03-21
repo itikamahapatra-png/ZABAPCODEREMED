@@ -495,7 +495,7 @@
 **&---------------------------------------------------------------------*
 **& Fetching data from table
 **&---------------------------------------------------------------------*
-*    SELECT field2 FROM agr_tcodes INTO TABLE lt_data_tcodes WHERE agr_name IN s_r_name.
+*    SELECT * FROM agr_tcodes INTO TABLE lt_data_tcodes WHERE agr_name IN s_r_name.
 *
 **&---------------------------------------------------------------------*
 **& Checking File name exists or not, if exists same filename concatinating
