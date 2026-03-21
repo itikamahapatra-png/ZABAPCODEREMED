@@ -214,7 +214,7 @@ DATA: t_work    TYPE TABLE OF swncaggusertcode, "SWNCHITLIST
 "Workload component
 DATA: t_output TYPE TABLE OF zworkload
 *      ts_output type zworkload.
-       WITH HEADER LINE.
+       .
 
 DATA: itsktp TYPE swnctasktyperaw.
 DATA: BEGIN OF t_elcod OCCURS 0,
