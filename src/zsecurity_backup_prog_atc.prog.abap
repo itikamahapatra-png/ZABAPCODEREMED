@@ -223,7 +223,7 @@ DATA: t_work    TYPE TABLE OF swncaggusertcode, "SWNCHITLIST
 "Workload component
 DATA: t_output TYPE TABLE OF zworkload
 *      ts_output type zworkload.
-       WITH HEADER LINE.
+       .
 
 DATA: itsktp TYPE swnctasktyperaw.
 DATA: BEGIN OF t_elcod OCCURS 0,
@@ -1905,13 +1905,13 @@ START-OF-SELECTION.
 * Step Counter for each report/transaction
         CLEAR h_steps.
 *      MOVE t_work-account TO h_steps-account.
-        MOVE ws_work-account TO h_steps-account.
+        h_steps-account = ws_work-account.
 *      MOVE t_work-entry_id(40) TO h_steps-entry_id.
-        MOVE ws_work-entry_id(40) TO h_steps-entry_id.
+        h_steps-entry_id = ws_work-entry_id(40).
 *      MOVE t_dirmoni-periodstrt(6) TO h_steps-period.
-        MOVE ts_dirmoni-periodstrt(6) TO h_steps-period.
+        h_steps-period = ts_dirmoni-periodstrt(6).
 *      MOVE t_work-count TO h_steps-count. "numero di steps
-        MOVE ws_work-count TO h_steps-count. "numero di steps
+        h_steps-count = ws_work-count.
         READ TABLE it_steps WITH KEY account  = h_steps-account
                                     entry_id = h_steps-entry_id
                                     period  = h_steps-period
@@ -1929,24 +1929,24 @@ START-OF-SELECTION.
         "Filter to verify selection conditions
         CLEAR t_output.
 *      MOVE t_work-account TO t_output-account.
-        MOVE ws_work-account TO t_output-account.
+        t_output-account = ws_work-account.
 *      MOVE t_work-entry_id+72(1) TO t_output-typelem.
-        MOVE ws_work-entry_id+72(1) TO t_output-typelem.
+        t_output-typelem = ws_work-entry_id+72(1).
         IF t_output-typelem = 'T'.
 *        MOVE t_work-entry_id(40) TO t_output-ztcode. "Save transaction code or report
-          MOVE ws_work-entry_id(40) TO t_output-ztcode. "Save transaction code or report
+          t_output-ztcode = ws_work-entry_id(40).
         ENDIF.
         CONDENSE t_output-ztcode NO-GAPS.
 *      CONDENSE ts_output-ztcode NO-GAPS.
 *      IF NOT t_work-entry_id+40(32) IS INITIAL. "If name defined = JOB
         IF NOT ws_work-entry_id+40(32) IS INITIAL. "If name defined = JOB
 *        MOVE 'B' TO t_output-zlncht.
-          MOVE 'B' TO t_output-zlncht.
+          t_output-zlncht = 'B'.
         ENDIF.
-        MOVE ts_dirmoni-periodstrt(6) TO t_output-period.
+        t_output-period = ts_dirmoni-periodstrt(6).
 *      MOVE t_dirmoni-periodstrt(6) TO t_output-period.
 *      MOVE t_work-tasktype TO t_output-destasktype. "To convert
-        MOVE ws_work-tasktype TO t_output-destasktype. "To convert
+        t_output-destasktype = ws_work-tasktype.
         PERFORM verifica_selezioni USING t_output
                                     CHANGING i_valido.
         IF i_valido EQ 'X'.
@@ -2025,7 +2025,7 @@ START-OF-SELECTION.
     DATA: search_trsn TYPE string.
     " Conversion task type description
     CLEAR itsktp.
-    MOVE t_output-destasktype TO itsktp.
+    itsktp = t_output-destasktype.
 *  MOVE ts_output-destasktype TO itsktp.
     CLEAR t_output-destasktype.
 *  CLEAR ts_output-destasktype.
