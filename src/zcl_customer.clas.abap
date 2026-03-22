@@ -50,7 +50,7 @@ METHOD get_customer_hierarchy.
   "---------------------------------------------------------
   " 1. ATC ERROR: SELECT * (instead of field list)
   "---------------------------------------------------------
-  SELECT * FROM kna1 INTO TABLE @DATA(lt_kna1)
+  SELECT KUNNR FROM kna1 INTO TABLE @DATA(lt_kna1)
     WHERE kunnr = @iv_kunnr.
 
   " ATC ERROR: Hard-coded MESSAGE + EXIT
@@ -62,12 +62,13 @@ METHOD get_customer_hierarchy.
   "---------------------------------------------------------
   " 2. ATC ERROR: FOR ALL ENTRIES without initial check
   "---------------------------------------------------------
-  SELECT * FROM knvh INTO TABLE @et_hierarchy
+  SELECT HITYP,KUNNR,VKORG,VTWEG,SPART FROM knvh INTO TABLE @et_hierarchy
     FOR ALL ENTRIES IN @lt_kna1
     WHERE kunnr = @lt_kna1-kunnr.
 
   " ATC ERROR: DELETE ADJACENT DUPLICATES without SORT
-  DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
+  SORT et_hierarchy BY HITYP.
+DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
 
   " ATC ERROR: READ TABLE without BINARY SEARCH
   READ TABLE et_hierarchy INTO DATA(ls_hier) WITH KEY kunnr = iv_kunnr.
@@ -155,7 +156,7 @@ ENDMETHOD.
   "---------------------------------------------------------
   " 2. Read KNVV for this customer
   "---------------------------------------------------------
-  SELECT *
+  SELECT KUNNR
     FROM knvv
     WHERE kunnr = @iv_kunnr
     INTO TABLE @DATA(lt_knvv).
@@ -174,19 +175,19 @@ ENDMETHOD.
     IF ls_knvv-vkorg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Sales Org (VKORG)|.
-      RETURN.
+      RETURN.  "#EC CI_NOORDER
     ENDIF.
 
     IF ls_knvv-vtweg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Distribution Channel (VTWEG)|.
-      RETURN.
+      RETURN.  "#EC CI_NOORDER
     ENDIF.
 
     IF ls_knvv-spart IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Division (SPART)|.
-      RETURN.
+      RETURN.  "#EC CI_NOORDER
     ENDIF.
 
   ENDLOOP.
