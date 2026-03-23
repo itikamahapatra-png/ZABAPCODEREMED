@@ -156,7 +156,7 @@ ENDMETHOD.
   "---------------------------------------------------------
   " 2. Read KNVV for this customer
   "---------------------------------------------------------
-  SELECT KUNNR
+  SELECT HITYP,KUNNR,VKORG,VTWEG,SPART
     FROM knvv
     WHERE kunnr = @iv_kunnr
     INTO TABLE @DATA(lt_knvv).
