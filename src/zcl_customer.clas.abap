@@ -50,7 +50,7 @@ METHOD get_customer_hierarchy.
   "---------------------------------------------------------
   " 1. ATC ERROR: SELECT * (instead of field list)
   "---------------------------------------------------------
-  SELECT KUNNR,VKORG,VTWEG,SPART FROM kna1 INTO TABLE @DATA(lt_kna1)
+  SELECT KUNNR FROM kna1 INTO TABLE @DATA(lt_kna1)
     WHERE kunnr = @iv_kunnr.
 
   " ATC ERROR: Hard-coded MESSAGE + EXIT
