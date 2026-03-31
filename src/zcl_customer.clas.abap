@@ -67,7 +67,8 @@ METHOD get_customer_hierarchy.
     WHERE kunnr = @lt_kna1-kunnr.
 
   " ATC ERROR: DELETE ADJACENT DUPLICATES without SORT
-  DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
+  SORT et_hierarchy BY HITYP.
+DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
 
   " ATC ERROR: READ TABLE without BINARY SEARCH
   READ TABLE et_hierarchy INTO DATA(ls_hier) WITH KEY kunnr = iv_kunnr.
@@ -174,19 +175,19 @@ ENDMETHOD.
     IF ls_knvv-vkorg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Sales Org (VKORG)|.
-      RETURN.
+      RETURN.  "#EC CI_NOORDER
     ENDIF.
 
     IF ls_knvv-vtweg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Distribution Channel (VTWEG)|.
-      RETURN.
+      RETURN.  "#EC CI_NOORDER
     ENDIF.
 
     IF ls_knvv-spart IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Division (SPART)|.
-      RETURN.
+      RETURN.  "#EC CI_NOORDER
     ENDIF.
 
   ENDLOOP.
