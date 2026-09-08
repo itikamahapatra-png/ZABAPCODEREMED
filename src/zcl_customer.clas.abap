@@ -45,7 +45,7 @@ CLASS ZCL_CUSTOMER IMPLEMENTATION.
 
 METHOD get_customer_hierarchy.
 
-  CLEAR: ev_valid, ev_message, et_hierarchy.
+CLEAR: ev_valid, ev_message, et_hierarchy.
 
   "---------------------------------------------------------
   " 1. ATC ERROR: SELECT * (instead of field list)
@@ -89,51 +89,49 @@ ENDMETHOD.
 
 
   method GET_DATA.
+ CLEAR: ev_valid, ev_message.
 
-  CLEAR: ev_valid, ev_message.
-
-  "---------------------------------------------------------
+  "------------------------------
   " 1. Validate input
-  "---------------------------------------------------------
+  "------------------------------
   IF iv_kunnr IS INITIAL.
-    ev_valid   = abap_false.
+    ev_valid    = abap_false.
     ev_message = 'Customer number is empty'.
     RETURN.
   ENDIF.
 
-  "---------------------------------------------------------
+  "------------------------------
   " 2. Read general customer data (KNA1)
-  "---------------------------------------------------------
+  "------------------------------
   SELECT SINGLE *
     FROM kna1
     WHERE kunnr = @iv_kunnr
     INTO @DATA(ls_kna1).
 
   IF sy-subrc <> 0.
-    ev_valid   = abap_false.
+    ev_valid    = abap_false.
     ev_message = |Customer { iv_kunnr } not found in KNA1|.
     RETURN.
   ENDIF.
 
-  "---------------------------------------------------------
+  "------------------------------
   " 3. Read sales area data (KNVV)
-  "---------------------------------------------------------
+  "------------------------------
   SELECT SINGLE *
     FROM knvv
     WHERE kunnr = @iv_kunnr
     INTO @DATA(ls_knvv).
 
-  IF sy-subrc <> 0.
-    ev_valid   = abap_false.
+  IF ls_knvv IS INITIAL.
+    ev_valid    = abap_false.
     ev_message = |Customer { iv_kunnr } has no sales area data in KNVV|.
     RETURN.
   ENDIF.
 
-
-  "---------------------------------------------------------
+  "------------------------------
   " 5. Success
-  "---------------------------------------------------------
-  ev_valid   = abap_true.
+  "------------------------------
+  ev_valid    = abap_true.
   ev_message = |Customer { iv_kunnr } data retrieved successfully|.
 
 ENDMETHOD.
@@ -197,6 +195,7 @@ ENDMETHOD.
   "---------------------------------------------------------
   ev_valid  = abap_true.
   ev_message = |Customer { iv_kunnr } is valid in KNVV|.
+
 
 ENDMETHOD.
 ENDCLASS.
