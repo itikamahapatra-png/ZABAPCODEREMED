@@ -45,7 +45,7 @@ CLASS ZCL_CUSTOMER IMPLEMENTATION.
 
 METHOD get_customer_hierarchy.
 
-CLEAR: ev_valid, ev_message, et_hierarchy.
+  CLEAR: ev_valid, ev_message, et_hierarchy.
 
   "---------------------------------------------------------
   " 1. ATC ERROR: SELECT * (instead of field list)
@@ -67,8 +67,7 @@ CLEAR: ev_valid, ev_message, et_hierarchy.
     WHERE kunnr = @lt_kna1-kunnr.
 
   " ATC ERROR: DELETE ADJACENT DUPLICATES without SORT
-  SORT et_hierarchy BY HITYP.
-DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
+  DELETE ADJACENT DUPLICATES FROM et_hierarchy COMPARING HITYP KUNNR VKORG VTWEG SPART .
 
   " ATC ERROR: READ TABLE without BINARY SEARCH
   READ TABLE et_hierarchy INTO DATA(ls_hier) WITH KEY kunnr = iv_kunnr.
@@ -89,7 +88,8 @@ ENDMETHOD.
 
 
   method GET_DATA.
- CLEAR: ev_valid, ev_message.
+
+    CLEAR: ev_valid, ev_message.
 
   "------------------------------
   " 1. Validate input
@@ -173,19 +173,19 @@ ENDMETHOD.
     IF ls_knvv-vkorg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Sales Org (VKORG)|.
-      RETURN.  "#EC CI_NOORDER
+      RETURN.
     ENDIF.
 
     IF ls_knvv-vtweg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Distribution Channel (VTWEG)|.
-      RETURN.  "#EC CI_NOORDER
+      RETURN.
     ENDIF.
 
     IF ls_knvv-spart IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Division (SPART)|.
-      RETURN.  "#EC CI_NOORDER
+      RETURN.
     ENDIF.
 
   ENDLOOP.
@@ -195,7 +195,6 @@ ENDMETHOD.
   "---------------------------------------------------------
   ev_valid  = abap_true.
   ev_message = |Customer { iv_kunnr } is valid in KNVV|.
-
 
 ENDMETHOD.
 ENDCLASS.
