@@ -174,19 +174,19 @@ ENDMETHOD.
     IF ls_knvv-vkorg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Sales Org (VKORG)|.
-      RETURN.  "#EC CI_NOORDER
+      RETURN.
     ENDIF.
 
     IF ls_knvv-vtweg IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Distribution Channel (VTWEG)|.
-      RETURN.  "#EC CI_NOORDER
+      RETURN.
     ENDIF.
 
     IF ls_knvv-spart IS INITIAL.
       ev_valid  = abap_false.
       ev_message = |Customer { iv_kunnr } has missing Division (SPART)|.
-      RETURN.  "#EC CI_NOORDER
+      RETURN.
     ENDIF.
 
   ENDLOOP.
